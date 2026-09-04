@@ -1,95 +1,269 @@
-/**
- * Created by Christos Ploutarchou
- * Project : node_rest_api_with_mysql
- * Filename : routes.js
- * Date: 05/04/2020
- * Time: 01:45
- **/
 
-const post = require("../controllers/Post");
-const employee = require("../controllers/Employee"); // Import the Employee controller
-const auth = require("../controllers/Auth");
-const queue = require("../controllers/Queue");
-const videoQue = require("../controllers/VideoQue");
 const express = require("express");
+
 const router = express.Router();
 
-// 🚨 CORRECT MIDDLEWARE IMPORT: Since authJwt.js exports a single function, 
-// import it directly as 'verifyToken'. This resolves the "Undefined" error.
-const verifyToken = require("../middleware/authJwt"); 
 
-// --- AUTHENTICATION ROUTES ---
-router.post("/api/auth/login", auth.login);
-router.post("/api/auth/kioskLogin", auth.kioskLogin);
-router.post("/api/auth/signup", auth.signup);
+// ======================================================
+// CONTROLLERS
+// ======================================================
+const utilityDashboardController =
+    require("../controllers/UtilityDashboard.controller");
 
-// --- POST ROUTES ---
-router.post("/api/posts/create", post.create);
+const auth =
+    require("../controllers/Auth");
 
-// --- EMPLOYEE ROUTES (Protected by JWT) ---
-// Note: This route is now secured. The request must include a valid JWT.
-router.get(
-    "/api/employees/all", 
-    verifyToken, // 💡 Use 'verifyToken' directly as it is the exported function
-    employee.getAllEmployees
-);
+const utility =
+    require("../controllers/Utility.controller");
+
+const companyController =
+    require("../controllers/Company.controller");
+
+
+// ======================================================
+// MIDDLEWARE
+// ======================================================
+
+const verifyToken =
+    require("../middleware/authJwt");
+
+
+// ======================================================
+// AUTH
+// ======================================================
+
+// ======================================================
+// LOGIN
+// ======================================================
+//
+// POST
+// /api/auth/login
+//
+// ======================================================
+
 router.post(
-    "/api/employees/create", 
-    verifyToken, // 💡 Use 'verifyToken' directly as it is the exported function
-    employee.create
+    "/api/auth/login",
+    auth.login
 );
+
+
+router.get(
+    "/api/auth/validate",
+    verifyToken,
+    auth.validateToken
+);
+
+// ======================================================
+// UTILITY METERS
+// ======================================================
+
+
+// ======================================================
+// GET ALL UTILITY METERS
+// ======================================================
+//
+// GET
+// /api/utilities/meters
+//
+// ======================================================
+
+router.get(
+    "/api/utilities/meters",
+    verifyToken,
+    utility.getAllMeters
+);
+
+
+// ======================================================
+// GET UTILITY METER BY ID
+// ======================================================
+//
+// GET
+// /api/utilities/meters/:meter_id
+//
+// ======================================================
+
+router.get(
+    "/api/utilities/meters/:meter_id",
+    verifyToken,
+    utility.getMeterById
+);
+
+
+// ======================================================
+// CREATE UTILITY METER
+// ======================================================
+//
+// POST
+// /api/utilities/meters
+//
+// ======================================================
+
+router.post(
+    "/api/utilities/meters",
+    verifyToken,
+    utility.createMeter
+);
+
+
+// ======================================================
+// UPDATE UTILITY METER
+// ======================================================
+//
+// PUT
+// /api/utilities/meters/:meter_id
+//
+// ======================================================
+
 router.put(
-    "/api/employees/update", 
-    verifyToken, // 💡 Use 'verifyToken' directly as it is the exported function
-    employee.updateEmployee
+    "/api/utilities/meters/:meter_id",
+    verifyToken,
+    utility.updateMeter
 );
 
 
-// Queue
+// ======================================================
+// DELETE UTILITY METER
+// ======================================================
+//
+// DELETE
+// /api/utilities/meters/:meter_id
+//
+// ======================================================
+
+router.delete(
+    "/api/utilities/meters/:meter_id",
+    verifyToken,
+    utility.deleteMeter
+);
+
+
+// ======================================================
+// UTILITY READINGS
+// ======================================================
+
+
+// ======================================================
+// GET ALL UTILITY READINGS
+// ======================================================
+//
+// GET
+// /api/utilities/readings
+//
+// ======================================================
+
 router.get(
-    "/api/queue/today", 
-    verifyToken, // 💡 Use 'verifyToken' directly as it is the exported function
-    queue.getQueuesToday
+    "/api/utilities/readings",
+    verifyToken,
+    utility.getAllReadings
 );
-router.post(
-    "/api/queue/create", 
-    verifyToken, // 💡 Use 'verifyToken' directly as it is the exported function
-    queue.createQueue
-);
-router.post(
-    "/api/queue/serve", 
-    verifyToken, // 💡 Use 'verifyToken' directly as it is the exported function
-    queue.createServing
-);
-router.post(
-    "/api/queue/announce", 
-    verifyToken, // 💡 Use 'verifyToken' directly as it is the exported function
-    queue.updateQueueAnnounce
-);
-router.post(
-    "/api/serving/announce", 
-    verifyToken, // 💡 Use 'verifyToken' directly as it is the exported function
-    queue.updateServingQueueAnnouceStatus
-);
-router.post(
-    "/api/queue/done", 
-    verifyToken, // 💡 Use 'verifyToken' directly as it is the exported function
-    queue.markServingDone
-);
+
+
+// ======================================================
+// GET READINGS BY METER
+// ======================================================
+//
+// GET
+// /api/utilities/meters/:meter_id/readings
+//
+// ======================================================
+
 router.get(
-    "/api/queue/video", 
-    verifyToken, // 💡 Use 'verifyToken' directly as it is the exported function
-    videoQue.getActiveVideoAds
+    "/api/utilities/meters/:meter_id/readings",
+    verifyToken,
+    utility.getReadingsByMeter
 );
+
+
+
+
+// ======================================================
+// GET LATEST READING
+// ======================================================
+//
+// GET
+// /api/utilities/meters/:meter_id/latest
+//
+// ======================================================
+
 router.get(
-    "/api/queue/video/update-status", 
-    verifyToken, // 💡 Use 'verifyToken' directly as it is the exported function
-    videoQue.updateVideoAdStatus
+    "/api/utilities/meters/:meter_id/latest",
+    verifyToken,
+    utility.getLatestReading
 );
+
+
+// ======================================================
+// CREATE UTILITY READING
+// ======================================================
+//
+// POST
+// /api/utilities/readings
+//
+// This endpoint can later be used by:
+// - ESP32
+// - Smart Electricity Meter
+// - Smart Water Meter
+//
+// ======================================================
+
 router.post(
-    "/api/queue/video/create", 
-    verifyToken, // 💡 Use 'verifyToken' directly as it is the exported function
-    videoQue.createVideoAd
+    "/api/utilities/readings",
+    verifyToken,
+    utility.createReading
 );
+
+router.put(
+    "/api/utilities/meters/:meter_id/readings/pay-all",
+    verifyToken,
+    utility.markAllReadingsPaid
+);
+
+
+router.get(
+    "/api/dashboard",
+    verifyToken,
+    utilityDashboardController.getDashboard
+);
+
+router.get(
+    "/api/utilities/rates/:utility_type",
+    verifyToken,
+    utility.getUtilityRate
+);
+
+router.get(
+    "/api/utilities/rates",
+    verifyToken,
+    utility.getAllRates
+);
+
+router.post(
+    "/api/utilities/rates",
+    verifyToken,
+    utility.createUtilityRate
+);
+
+
+
+router.get(
+    "/api/companies",
+    verifyToken,
+    companyController.getMyCompanies
+);
+
+router.post(
+    "/api/companies",
+    verifyToken,
+    companyController.createCompany
+);
+
+
+
+// ======================================================
+// EXPORT
+// ======================================================
+
 
 module.exports = router;
+
