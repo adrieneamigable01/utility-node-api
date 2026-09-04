@@ -1,37 +1,124 @@
 module.exports = (database, Sequelize) => {
-    // Defines the model and table name as 'users'
+
     return database.define("users", {
-        user_id: {
+
+        // ==========================================
+        // PRIMARY KEY
+        // ==========================================
+        userid: {
+            type: Sequelize.INTEGER,
+            primaryKey: true,
+            autoIncrement: true,
+            allowNull: false
+        },
+
+        // ==========================================
+        // NAME
+        // ==========================================
+        lastname: {
             type: Sequelize.STRING,
-            allowNull: false,
-            primaryKey: true, // Set user_id as the primary key
+            allowNull: false
+        },
+
+        firstname: {
+            type: Sequelize.STRING,
+            allowNull: false
+        },
+
+        middlename: {
+            type: Sequelize.STRING,
+            allowNull: true
+        },
+
+        // ==========================================
+        // CONTACT
+        // ==========================================
+        email: {
+            type: Sequelize.STRING,
+            allowNull: true,
             unique: true
         },
-        username: {
+
+        mobile_number: {
             type: Sequelize.STRING,
-            allowNull: false,
-            unique: true // Ensures no two users share the same username
+            allowNull: true
         },
+
+        // ==========================================
+        // PASSWORD
+        // ==========================================
         password: {
             type: Sequelize.STRING,
             allowNull: false
         },
-        user_type: {
-            type: Sequelize.STRING, // e.g., 'Admin', 'Staff', 'Manager'
+
+        // ==========================================
+        // BIRTHDATE
+        // ==========================================
+        birthdate: {
+            type: Sequelize.DATEONLY,
+            allowNull: true
+        },
+
+        // ==========================================
+        // USER TYPE
+        // ==========================================
+        usertype: {
+            type: Sequelize.STRING,
             allowNull: false
         },
+
+        // ==========================================
+        // ROLE
+        // ==========================================
         role: {
-            type: Sequelize.STRING, // e.g., 'Admin', 'Staff', 'Manager'
+            type: Sequelize.STRING,
             allowNull: false
         },
-        created_at: {
+
+        // ==========================================
+        // DATE ADDED
+        // ==========================================
+        date_added: {
             type: Sequelize.DATE,
+            allowNull: true,
             defaultValue: Sequelize.NOW
+        },
+
+        // ==========================================
+        // USER IMAGE
+        // ==========================================
+        user_image: {
+            type: Sequelize.STRING,
+            allowNull: true
+        },
+
+        // ==========================================
+        // ACTIVE
+        // ==========================================
+        is_active: {
+            type: Sequelize.BOOLEAN,
+            allowNull: true,
+            defaultValue: true
+        },
+
+        // ==========================================
+        // LAST PASSWORD UPDATE
+        // ==========================================
+        last_password_update: {
+            type: Sequelize.DATE,
+            allowNull: true
         }
+
     }, {
-        // Disable Sequelize's default 'createdAt' and 'updatedAt' 
-        // since your table uses 'created_at' and does not use 'updatedAt'.
-        timestamps: false,
-        tableName: 'users' // Explicitly set the table name
+
+        // ==========================================
+        // TABLE SETTINGS
+        // ==========================================
+        tableName: "users",
+
+        timestamps: false
+
     });
+
 };
