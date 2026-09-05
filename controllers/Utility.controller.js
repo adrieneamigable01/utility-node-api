@@ -329,10 +329,7 @@ exports.getReadingsByMeter = async (req, res) => {
             return {
                 ...reading,
 
-                consumption:
-                    consumption !== null
-                        ? consumption.toFixed(4)
-                        : null
+                consumption:0
             };
         });
 
