@@ -329,7 +329,10 @@ exports.getReadingsByMeter = async (req, res) => {
             return {
                 ...reading,
 
-                consumption:0
+                consumption:
+                    consumption !== null
+                        ? consumption.toFixed(4)
+                        : null
             };
         });
 
@@ -340,7 +343,7 @@ exports.getReadingsByMeter = async (req, res) => {
             data: processedReadings,
             count: processedReadings.length,
             isError: false,
-            message: "Success fetch meter readings"
+            message: "Success fetch meter readingss"
         });
 
     } catch (error) {
