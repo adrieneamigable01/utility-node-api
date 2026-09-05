@@ -269,13 +269,13 @@ exports.getReadingsByMeter = async (req, res) => {
     try {
         const meterId = req.params.meter_id;
 
+        // Get readings from oldest to newest
         const readings = await db.databaseConf.query(
             `
             SELECT
                 reading_id,
                 meter_id,
                 reading_value,
-                consumption,
                 payment_status,
                 voltage,
                 current,
@@ -296,31 +296,39 @@ exports.getReadingsByMeter = async (req, res) => {
             }
         );
 
-        // Calculate consumption from the previous meter reading
+        // Calculate consumption
         const processedReadings = readings.map((reading, index) => {
+
             const currentReading =
-                parseFloat(reading.reading_value) || 0;
+                Number.parseFloat(reading.reading_value);
 
             let consumption = null;
 
             // First reading has no previous reading
             if (index > 0) {
+
                 const previousReading =
-                    parseFloat(
+                    Number.parseFloat(
                         readings[index - 1].reading_value
-                    ) || 0;
+                    );
 
-                consumption =
-                    currentReading - previousReading;
+                if (
+                    Number.isFinite(currentReading) &&
+                    Number.isFinite(previousReading)
+                ) {
+                    consumption =
+                        currentReading - previousReading;
 
-                // Prevent negative consumption
-                if (consumption < 0) {
-                    consumption = 0;
+                    // Prevent negative consumption
+                    if (consumption < 0) {
+                        consumption = 0;
+                    }
                 }
             }
 
             return {
                 ...reading,
+
                 consumption:
                     consumption !== null
                         ? consumption.toFixed(4)
@@ -328,17 +336,18 @@ exports.getReadingsByMeter = async (req, res) => {
             };
         });
 
-        // Return newest readings first
+        // Return newest first
         processedReadings.reverse();
 
         return res.status(200).send({
             data: processedReadings,
             count: processedReadings.length,
             isError: false,
-            message: "Meter readings loaded successfully."
+            message: "Success fetch meter readings"
         });
 
     } catch (error) {
+
         console.error(
             "GET READINGS BY METER ERROR:",
             error
