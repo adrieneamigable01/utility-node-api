@@ -343,7 +343,7 @@ exports.getReadingsByMeter = async (req, res) => {
             data: processedReadings,
             count: processedReadings.length,
             isError: false,
-            message: "Success fetch meter readingss"
+            message: "Success fetch meter readings"
         });
 
     } catch (error) {
@@ -1596,112 +1596,6 @@ exports.getAllReadings = async (req, res) => {
 
 };
 
-
-
-// =====================================================
-// GET READINGS BY METER
-// =====================================================
-
-exports.getReadingsByMeter = async (req, res) => {
-
-    try {
-
-        const { meter_id } = req.params;
-
-
-        if (!meter_id) {
-
-            return res.status(400).send({
-
-                data: [],
-
-                count: 0,
-
-                isError: true,
-
-                message:
-                    "meter_id is required"
-
-            });
-
-        }
-
-
-        const data = await db.databaseConf.query(`
-
-            SELECT
-
-                reading_id,
-                meter_id,
-                reading_value,
-                consumption,
-                payment_status,
-                voltage,
-                current,
-                power_kw,
-                power_factor,
-                flow_rate,
-                recorded_at,
-                created_at
-
-            FROM utility_readings
-
-            WHERE meter_id = :meter_id
-
-            ORDER BY
-                recorded_at DESC,
-                reading_id DESC
-
-        `, {
-
-            replacements: {
-                meter_id
-            },
-
-            type: db.Sequelize.QueryTypes.SELECT
-
-        });
-
-
-        return res.status(200).send({
-
-            data,
-
-            count: data.length,
-
-            isError: false,
-
-            message:
-                "Success fetch meter readings"
-
-        });
-
-
-    } catch (error) {
-
-        console.error(
-            "GET READINGS BY METER ERROR:",
-            error
-        );
-
-
-        return res.status(500).send({
-
-            data: [],
-
-            count: 0,
-
-            isError: true,
-
-            message:
-                error.message ||
-                "Error retrieving meter readings"
-
-        });
-
-    }
-
-};
 
 
 
