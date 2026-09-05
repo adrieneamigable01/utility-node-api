@@ -286,7 +286,7 @@ exports.getReadingsByMeter = async (req, res) => {
                 created_at
             FROM utility_readings
             WHERE meter_id = :meter_id
-            ORDER BY recorded_at DESC, reading_id DESC
+            ORDER BY recorded_at ASC, reading_id ASC
             `,
             {
                 replacements: {
@@ -296,9 +296,44 @@ exports.getReadingsByMeter = async (req, res) => {
             }
         );
 
+        // Calculate consumption from the previous meter reading
+        const processedReadings = readings.map((reading, index) => {
+            const currentReading =
+                parseFloat(reading.reading_value) || 0;
+
+            let consumption = null;
+
+            // First reading has no previous reading
+            if (index > 0) {
+                const previousReading =
+                    parseFloat(
+                        readings[index - 1].reading_value
+                    ) || 0;
+
+                consumption =
+                    currentReading - previousReading;
+
+                // Prevent negative consumption
+                if (consumption < 0) {
+                    consumption = 0;
+                }
+            }
+
+            return {
+                ...reading,
+                consumption:
+                    consumption !== null
+                        ? consumption.toFixed(4)
+                        : null
+            };
+        });
+
+        // Return newest readings first
+        processedReadings.reverse();
+
         return res.status(200).send({
-            data: readings,
-            count: readings.length,
+            data: processedReadings,
+            count: processedReadings.length,
             isError: false,
             message: "Meter readings loaded successfully."
         });
